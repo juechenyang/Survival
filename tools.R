@@ -26,29 +26,30 @@ get_surv_obj <- function(df){
   return(surv_object)
 }
 
-run_survival <- function(df, group, parameter, threshold=NULL){
+run_survival <- function(df, group, parameter, threshold){
   surv_object <- get_surv_obj(df)
   fit_geneexpr = surv_fit(as.formula(paste('surv_object ~', group)),data=df)
-  group_text = c(paste0(parameter, " high"), paste0(parameter, " low"))
+  group_tags = unique(df[[group]])
+  print(group_tags)
+  group_text = paste0(parameter, " ", group_tags)
   plot_fit = ggsurvplot(fit_geneexpr,data=df,risk.table = TRUE,
                         tables.theme = theme_survminer(font.tickslab = 10), 
-                        risk.table.height=0.44, fontsize = 3,xlab = "Time in Months",
-                        legend.lab = group_text)
+                        risk.table.height=0.44, fontsize = 3,xlab = "Time in Months"
+#                        ,legend.lab = group_text
+                        )
   fit_pmodel = surv_pvalue(fit_geneexpr,data=df,method="survdiff")
   fit_pval=fit_pmodel$pval
   
-  if(class(df[[parameter]])=='numeric'){
-    high_count = table(df[[group]])[c('High')]
-    low_count = table(df[[group]])[c('Low')]
+  if("High" %in% group_tags){
+    high_count = table(df[[group]])[group_tags[1]]
+    low_count = table(df[[group]])[group_tags[2]]
     fit_annot = sprintf("high-low groups cutoff = %.2f\nP-value(Log-Rank) = %.5f\nHigh group count = %s\nLow group count = %s",threshold,fit_pval,high_count, low_count)
   }else{
-    fit_annot = sprintf("P-value(Log-Rank) = %.5f",fit_pval)
-    all_groups = table(df[[group]])
-    anno_str=''
-    for(i in 1:length(all_groups)){
-      anno_str = paste0(anno_str, '#', names(all_groups)[[i]], '=', as.character(all_groups[[i]]), '\n')
-    }
-    count_annot=anno_str
+    high_count = table(df[[group]])[group_tags[1]]
+    low_count = table(df[[group]])[group_tags[2]]
+    threshold = round(threshold, 2)
+    threshold = paste(threshold, collapse = ",")
+    fit_annot = sprintf("groups cutoff = %s\nP-value(Log-Rank) = %.5f\ntop25 group count = %s\nbottom group count = %s",threshold,fit_pval,high_count, low_count)
   }
   plot_fit$plot = plot_fit$plot+annotate("text",x=0,y=0.3,label=fit_annot,size=3,hjust=0)
   return(plot_fit)
