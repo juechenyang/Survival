@@ -71,6 +71,5 @@ gene_name = c("MT-CO1","MT-CO2","MT-CO3","MT-ATP6","MT-ATP8",
               "MT-ND1","MT-ND3","MT-ND4","MT-ND4L")
 gene_list = list("MT" = gene_name)
 plot = get_survival_plot(gene_list = gene_list, cohort_25 = T)
-
-
+plot
 
