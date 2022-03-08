@@ -33,15 +33,17 @@ run_survival <- function(df, group, parameter, threshold){
   if("top25" %in% group_tags){
     colors = c("top25"="#f9837b", "bottom25"="#09c1c6")
     palette_colors = as.character(colors[c("bottom25", "top25")])
+    group_text = paste0(parameter, " ", c("bottom25", "top25"))
   }else{
     colors = c("High"="#f9837b", "Low"="#09c1c6")
     palette_colors = as.character(colors[c("High", "Low")])
+    group_text = paste0(parameter, " ", c("High", "Low"))
   }
-  group_text = paste0(parameter, " ", group_tags)
+  
   plot_fit = ggsurvplot(fit_geneexpr,data=df,risk.table = TRUE,
                         tables.theme = theme_survminer(font.tickslab = 10), 
                         risk.table.height=0.44, fontsize = 3,xlab = "Time in Months"
-#                        ,legend.lab = group_text
+                        ,legend.lab = group_text
                         ,palette = palette_colors
                         )
   fit_pmodel = surv_pvalue(fit_geneexpr,data=df,method="survdiff")
