@@ -6,7 +6,7 @@ Complex_V = c("ATP5A1(ATP5F1A)","ATP5C1(ATP5F1C)","ATP5D(ATP5F1D)","ATP5E(ATP5F1
               "ATP5H(ATP5PD)","ATP5I(ATP5ME)","ATP5J(ATP5PF)","ATP5J2(ATP5MF)",
               "ATP5L(ATP5MG)","ATP5O")
 Complex_V = sapply(Complex_V, function(x){
-   a = str_split_fixed(x, "\\(", 2)[1,1]
+   a = stringr::str_split_fixed(x, "\\(", 2)[1,1]
    return(a)
 })
 Complex_V = as.character(Complex_V)
@@ -37,3 +37,15 @@ MRP_negative = c("MRPL12","MRPL14","MRPL15","MRPL17","MRPL18","MRPL23","MRPL24",
                  "MRPS15","MRPS16","MRPS25")
 mt_gene = c("MT-CO1","MT-CO2","MT-CO3","MT-ATP6","MT-ATP8",
             "MT-ND1","MT-ND3","MT-ND4","MT-ND4L")
+new_signature = c("OSBPL6","NTM","RFTN1","MAPRE2","CXADR","DYSF","TGFA","EPHA6",
+                  "GJB2","FBXL7","DTX4","UNC5B","PKP2","PRSS12","SLC16A2","EPHB1",
+                  "MAN1A1","ADM","EDIL3","LGI2","DHRS3","PCDH7","PTPRU","CHSY3",
+                  "APLP1","SEMA5B","ATRNL1","UST","GAS6","SLC39A8","SLIT2","EIF4E3",
+                  "TESC","PMP22","RBFOX3","WNT5A","FAM171B","AMIGO2","FGF9","PANX2",
+                  "TLL2","GPC6","NOG","MAPK11","HLX","RNF182","PIK3AP1","PCDH1","ZIC2",
+                  "RYR2","ADAMTS7","MATN3","WT1","HLF","TMEM121","ADORA2B","RTN4RL2",
+                  "TMOD2","CXCL16","GJA3","LMO1","SLC25A21","SOBP","RAB20","B4GALNT1",
+                  "PTHLH","COL15A1","KIAA1217","KIAA1324","RAB6B","CLDN23","MAL","ITPKA",
+                  "ATP8A2","MMP16","RGL1","CACNA1D","TMEM163","HCN4","ZFPM2","KLHL14",
+                  "NEGR1","HOXC11","SLFN11","PALM3","ITGB4","ABCA5","SCAMP5","TPPP",
+                  "CITED1","CACNB4","SGPP2","NKX3-2","CD83","SPHK1")

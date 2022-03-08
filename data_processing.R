@@ -1,7 +1,6 @@
 #preprocessing
 library(readr)
 library(dplyr)
-library(ggpubr)
 source("tools.R")
 source("signature_lib.R")
 #expression
@@ -17,11 +16,13 @@ exp_matrix_gene_anno = exp_matrix_gene_anno[!duplicated(exp_matrix_gene_anno[c("
 rownames(exp_matrix_gene_anno) = exp_matrix_gene_anno$gene
 exp_matrix_gene_anno = exp_matrix_gene_anno[,3:ncol(exp_matrix_gene_anno)]
 clinical_df = read_tsv("TCGA-KIRC.GDC_phenotype.tsv", col_names = T)
-clinical_df = data.frame(clinical_df, check.names = F)[,c("submitter_id.samples","sample_type.samples")]
+clinical_features = c("submitter_id.samples","sample_type.samples","gender.demographic")
+clinical_df = data.frame(clinical_df, check.names = F)[,clinical_features]
 clinical_df = clinical_df[clinical_df$sample_type.samples=="Primary Tumor",]
+clinical_df = clinical_df[clinical_df$gender.demographic=="male",]
 survival_raw = data.frame(read_tsv("TCGA-KIRC.survival.tsv", col_names = T),check.names = F)
 
-get_survival_plot = function(gene_list, cohort_25 = F){
+get_survival_plot = function(gene_list, cohort_25 = F, percent=0.25){
   plot_list = list()
   for(x in 1:length(gene_list)){
     gene_signature_name = names(gene_list)[x]
@@ -34,14 +35,8 @@ get_survival_plot = function(gene_list, cohort_25 = F){
     }
     gene_names = gene_names[is_in_exp]
     exp_vector = exp_matrix_gene_anno[gene_names, ]
-    if(all(gene_names %in% rownames(exp_matrix_gene_anno))){
-      exp_vector = exp_matrix_gene_anno[gene_names, ]
-    }else{
-      print(paste0(gene_names, " is not available for analysis"))
-    }
     exp_vector[gene_signature_name, ] = apply(exp_vector, MARGIN = 2, FUN = mean)
     exp_vector = exp_vector[nrow(exp_vector),]
-    
     exp_vector_t = data.frame(t(exp_vector), check.names = F)
     exp_vector_t$sample_id = rownames(exp_vector_t)
     exp_vector_t = exp_vector_t[exp_vector_t$sample_id %in% clinical_df$submitter_id.samples,]
@@ -54,8 +49,8 @@ get_survival_plot = function(gene_list, cohort_25 = F){
                                         custom = 1.5, "OS.time", "OS")
     group_var = paste0(gene_signature_name, "_group")
     if(cohort_25){
-      top25_threshold = quantile(survival_data[[gene_signature_name]], 0.75)
-      bottom25_threshold = quantile(survival_data[[gene_signature_name]], 0.25)
+      top25_threshold = quantile(survival_data[[gene_signature_name]], (1-percent))
+      bottom25_threshold = quantile(survival_data[[gene_signature_name]], percent)
       survival_data[[group_var]] <- sapply(survival_data[[gene_signature_name]], function(x){
         if(x >= top25_threshold){
           return("top25")
@@ -92,14 +87,22 @@ gene_list = list("MT" = mt_gene
 plot_list = get_survival_plot(gene_list = gene_list, cohort_25 = F)
 
 
-png("survival_mean_compare.png", units = "in", res = 300, width = 18, height = 18)
+png("survival_mean_compare.png", units = "in", res = 300, width = 20, height = 16)
 arrange_ggsurvplots(plot_list, print = TRUE,
                     ncol = 3, nrow = 3, risk.table.height = 0.3)
 dev.off()
 
-png("survival_10percent_compare.png", units = "in", res = 300, width = 18, height = 18)
+png("survival_25percent_compare.png", units = "in", res = 300, width = 20, height = 16)
 arrange_ggsurvplots(plot_list, print = TRUE,
                     ncol = 3, nrow = 3, risk.table.height = 0.3)
+dev.off()
+
+gene_list = list("new_sig"=new_signature)
+plot_list = get_survival_plot(gene_list = gene_list, cohort_25 = T)
+plt_list[[2]] =  plot_list[[1]]
+png("survival_new_sig.png", units = "in", res = 300, width = 10, height = 6)
+arrange_ggsurvplots(plt_list, print = TRUE,
+                    ncol = 2, risk.table.height = 0.3)
 dev.off()
 
 
