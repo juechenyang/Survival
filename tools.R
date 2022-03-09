@@ -40,9 +40,11 @@ run_survival <- function(df, group, parameter, threshold){
     group_text = paste0(parameter, " ", c("High", "Low"))
   }
   
-  plot_fit = ggsurvplot(fit_geneexpr,data=df,risk.table = TRUE,
-                        tables.theme = theme_survminer(font.tickslab = 10), 
-                        risk.table.height=0.44, fontsize = 3,xlab = "Time in Months"
+  plot_fit = ggsurvplot(fit_geneexpr,data=df
+#                        ,tables.theme = theme_survminer(font.tickslab = 10)
+                        ,risk.table = F
+#                        ,risk.table.height=0.44
+                        ,fontsize = 3,xlab = "Time in Months"
                         ,legend.lab = group_text
                         ,palette = palette_colors
                         )

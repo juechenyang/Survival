@@ -19,7 +19,7 @@ clinical_df = read_tsv("TCGA-KIRC.GDC_phenotype.tsv", col_names = T)
 clinical_features = c("submitter_id.samples","sample_type.samples","gender.demographic")
 clinical_df = data.frame(clinical_df, check.names = F)[,clinical_features]
 clinical_df = clinical_df[clinical_df$sample_type.samples=="Primary Tumor",]
-clinical_df = clinical_df[clinical_df$gender.demographic=="male",]
+#clinical_df = clinical_df[clinical_df$gender.demographic=="male",]
 survival_raw = data.frame(read_tsv("TCGA-KIRC.survival.tsv", col_names = T),check.names = F)
 
 get_survival_plot = function(gene_list, cohort_25 = F, percent=0.25){
@@ -75,34 +75,48 @@ get_survival_plot = function(gene_list, cohort_25 = F, percent=0.25){
 }
 
 
-gene_list = list("MT" = mt_gene
+gene_list = list("MT" = MT
                  ,"Complex_I"=Complex_I
                  ,"Complex_II"=Complex_II
                  ,"Complex_III"=Complex_III
                  ,"Complex_IV"=Complex_IV
                  ,"Complex_V"=Complex_V
+                 ,"TCA"=TCA
+                 ,"glycolysis"=glycolysis
                  ,"glycolyticAndTCA"=glycolyticAndTCA
+                 ,"MAS"=MAS
+                 ,"HIF1A" = HIF1A
+                 ,"CU"=CU
+                 ,"EMT"=EMT
+                 ,"HIF1A_2A"=HIF1A_2A
                  ,"MRP_positive"=MRP_positive
-                 ,"MRP_negative"=MRP_negative)
-plot_list = get_survival_plot(gene_list = gene_list, cohort_25 = F)
-
-
-png("survival_mean_compare.png", units = "in", res = 300, width = 20, height = 16)
-arrange_ggsurvplots(plot_list, print = TRUE,
-                    ncol = 3, nrow = 3, risk.table.height = 0.3)
-dev.off()
-
-png("survival_25percent_compare.png", units = "in", res = 300, width = 20, height = 16)
-arrange_ggsurvplots(plot_list, print = TRUE,
-                    ncol = 3, nrow = 3, risk.table.height = 0.3)
-dev.off()
-
-gene_list = list("new_sig"=new_signature)
+                 ,"MRP_negative"=MRP_negative
+                 )
 plot_list = get_survival_plot(gene_list = gene_list, cohort_25 = T)
-plt_list[[2]] =  plot_list[[1]]
-png("survival_new_sig.png", units = "in", res = 300, width = 10, height = 6)
-arrange_ggsurvplots(plt_list, print = TRUE,
-                    ncol = 2, risk.table.height = 0.3)
+
+
+
+
+png("survival_mean_compare.png", units = "in", res = 300, width = 18, height = 16)
+arrange_ggsurvplots(plot_list, print = TRUE,
+                    ncol = 4, nrow = 4
+#                    ,risk.table.height = 0.3
+                    )
 dev.off()
+
+png("survival_25percent_compare.png", units = "in", res = 300, width = 18, height = 16)
+arrange_ggsurvplots(plot_list, print = TRUE,
+                    ncol = 4, nrow = 4
+#                   ,risk.table.height = 0.3
+                    )
+dev.off()
+
+# gene_list = list("new_sig"=new_signature)
+# plot_list = get_survival_plot(gene_list = gene_list, cohort_25 = T)
+# plt_list[[2]] =  plot_list[[1]]
+# png("survival_new_sig.png", units = "in", res = 300, width = 10, height = 6)
+# arrange_ggsurvplots(plt_list, print = TRUE,
+#                     ncol = 2, risk.table.height = 0.3)
+# dev.off()
 
 

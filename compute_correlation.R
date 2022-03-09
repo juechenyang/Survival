@@ -12,23 +12,35 @@ gene_anno = gene_anno[,c("id", "gene")]
 #join gene anno with expression matrix
 exp_matrix_gene_anno = inner_join(gene_anno, exp_matrix, by=c("id"="Ensembl_ID"))
 exp_matrix_gene_anno = exp_matrix_gene_anno[!duplicated(exp_matrix_gene_anno[c("gene")]),]
+#limit to protein coding genes
+protein_coding_genes = read.csv("human_gene_pos.csv", header = T)
+exp_matrix_gene_anno = exp_matrix_gene_anno[
+  exp_matrix_gene_anno$gene %in% protein_coding_genes$gene_name,]
 rownames(exp_matrix_gene_anno) = exp_matrix_gene_anno$gene
 exp_matrix_gene_anno = exp_matrix_gene_anno[,3:ncol(exp_matrix_gene_anno)]
 clinical_df = read_tsv("TCGA-KIRC.GDC_phenotype.tsv", col_names = T)
 clinical_df = data.frame(clinical_df, check.names = F)[,c("submitter_id.samples","sample_type.samples")]
 clinical_df = clinical_df[clinical_df$sample_type.samples=="Primary Tumor",]
 
-gene_list = list("MT" = mt_gene
+gene_list = list("MT" = MT
                  ,"Complex_I"=Complex_I
                  ,"Complex_II"=Complex_II
                  ,"Complex_III"=Complex_III
                  ,"Complex_IV"=Complex_IV
                  ,"Complex_V"=Complex_V
+                 ,"TCA"=TCA
+                 ,"glycolysis"=glycolysis
                  ,"glycolyticAndTCA"=glycolyticAndTCA
+                 ,"MAS"=MAS
+                 ,"HIF1A" = HIF1A
+                 ,"CU"=CU
+                 ,"EMT"=EMT
+                 ,"HIF1A_2A"=HIF1A_2A
                  ,"MRP_positive"=MRP_positive
-                 ,"MRP_negative"=MRP_negative)
+                 ,"MRP_negative"=MRP_negative
+                 )
 
-x=9
+x=16
 gene_signature_name = names(gene_list)[x]
 gene_names = unlist(gene_list[gene_signature_name], use.names = F)
 is_in_exp = gene_names %in% rownames(exp_matrix_gene_anno)
@@ -56,6 +68,7 @@ correlation_value = data.frame(t(correlation_value))
 names(correlation_value) = c("cor", "p.value")
 correlation_value = na.omit(correlation_value)
 correlation_value = correlation_value[order(correlation_value[,"cor"], decreasing = T), ]
+correlation_value$p.adjust = p.adjust(correlation_value$p.value)
 write.csv(correlation_value, paste0(gene_signature_name, "_correlated_genes.csv"))
 
 
