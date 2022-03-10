@@ -89,6 +89,8 @@ gene_list = list("MT" = MT
                  ,"CU"=CU
                  ,"EMT"=EMT
                  ,"HIF1A_2A"=HIF1A_2A
+                 ,"HLA"=HLA
+                 ,"MRP"=MRP
                  ,"MRP_positive"=MRP_positive
                  ,"MRP_negative"=MRP_negative
                  )
@@ -97,16 +99,16 @@ plot_list = get_survival_plot(gene_list = gene_list, cohort_25 = T)
 
 
 
-png("survival_mean_compare.png", units = "in", res = 300, width = 18, height = 16)
+png("survival_mean_compare.png", units = "in", res = 400, width = 24, height = 13)
 arrange_ggsurvplots(plot_list, print = TRUE,
-                    ncol = 4, nrow = 4
+                    ncol = 5, nrow = 4
 #                    ,risk.table.height = 0.3
                     )
 dev.off()
 
-png("survival_25percent_compare.png", units = "in", res = 300, width = 18, height = 16)
+png("survival_25percent_compare.png", units = "in", res = 400, width = 24, height = 13)
 arrange_ggsurvplots(plot_list, print = TRUE,
-                    ncol = 4, nrow = 4
+                    ncol = 5, nrow = 4
 #                   ,risk.table.height = 0.3
                     )
 dev.off()
