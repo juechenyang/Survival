@@ -45,6 +45,8 @@ get_survival_plot = function(gene_list, cohort_25 = F, percent=0.25){
     survival_data = inner_join(exp_vector_t, survival_raw, by=c("sample_id"="sample"))
     survival_data = survival_data[!duplicated(survival_data[c("_PATIENT")]),]
     survival_data = survival_data %>% mutate(OS.time = round(OS.time/30.417, digit=0))
+    #keep data with OS less than 10 years
+    survival_data = survival_data[survival_data$OS.time<=120,]
     threshold = cutoff_function_options(survival_data, gene_signature_name, "mean",
                                         custom = 1.5, "OS.time", "OS")
     group_var = paste0(gene_signature_name, "_group")
@@ -106,7 +108,7 @@ arrange_ggsurvplots(plot_list, print = TRUE,
                     )
 dev.off()
 
-png("survival_25percent_compare.png", units = "in", res = 400, width = 24, height = 13)
+png("survival_25percent_compare.png", units = "in", res = 400, width = 18, height = 11)
 arrange_ggsurvplots(plot_list, print = TRUE,
                     ncol = 5, nrow = 4
 #                   ,risk.table.height = 0.3

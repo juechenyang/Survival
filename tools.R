@@ -33,11 +33,11 @@ run_survival <- function(df, group, parameter, threshold){
   if("top25" %in% group_tags){
     colors = c("top25"="#f9837b", "bottom25"="#09c1c6")
     palette_colors = as.character(colors[c("bottom25", "top25")])
-    group_text = paste0(parameter, " ", c("bottom25", "top25"))
+    group_text = c("bottom25", "top25")
   }else{
     colors = c("High"="#f9837b", "Low"="#09c1c6")
     palette_colors = as.character(colors[c("High", "Low")])
-    group_text = paste0(parameter, " ", c("High", "Low"))
+    group_text = c("High", "Low")
   }
   
   plot_fit = ggsurvplot(fit_geneexpr,data=df
@@ -46,22 +46,24 @@ run_survival <- function(df, group, parameter, threshold){
 #                        ,risk.table.height=0.44
                         ,fontsize = 3,xlab = "Time in Months"
                         ,legend.lab = group_text
+                        ,legend.title = parameter
                         ,palette = palette_colors
                         )
   fit_pmodel = surv_pvalue(fit_geneexpr,data=df,method="survdiff")
   fit_pval=fit_pmodel$pval
   
-  if("High" %in% group_tags){
-    high_count = table(df[[group]])[group_tags[1]]
-    low_count = table(df[[group]])[group_tags[2]]
-    fit_annot = sprintf("high-low groups cutoff = %.2f\nP-value(Log-Rank) = %.5f\nHigh group count = %s\nLow group count = %s",threshold,fit_pval,high_count, low_count)
-  }else{
-    high_count = table(df[[group]])[group_tags[1]]
-    low_count = table(df[[group]])[group_tags[2]]
-    threshold = round(threshold, 2)
-    threshold = paste(threshold, collapse = ",")
-    fit_annot = sprintf("groups cutoff = %s\nP-value(Log-Rank) = %.5f\ntop25 group count = %s\nbottom group count = %s",threshold,fit_pval,high_count, low_count)
-  }
+  # if("High" %in% group_tags){
+  #   high_count = table(df[[group]])[group_tags[1]]
+  #   low_count = table(df[[group]])[group_tags[2]]
+  #   fit_annot = sprintf("high-low groups cutoff = %.2f\nP-value(Log-Rank) = %.5f\nHigh group count = %s\nLow group count = %s",threshold,fit_pval,high_count, low_count)
+  # }else{
+  #   high_count = table(df[[group]])[group_tags[1]]
+  #   low_count = table(df[[group]])[group_tags[2]]
+  #   threshold = round(threshold, 2)
+  #   threshold = paste(threshold, collapse = ",")
+  #   fit_annot = sprintf("groups cutoff = %s\nP-value(Log-Rank) = %.5f\ntop25 group count = %s\nbottom group count = %s",threshold,fit_pval,high_count, low_count)
+  # }
+  fit_annot = sprintf("P-value(Log-Rank) = %.5f",fit_pval)
   plot_fit$plot = plot_fit$plot+annotate("text",x=0,y=0.3,label=fit_annot,size=3,hjust=0)
   return(plot_fit)
 }
