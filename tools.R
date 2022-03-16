@@ -40,14 +40,19 @@ run_survival <- function(df, group, parameter, threshold){
     group_text = c("High", "Low")
   }
   
+  if(grepl("_", parameter)){
+    parameter = stringr::str_replace_all(parameter, "_", " ")
+  }
   plot_fit = ggsurvplot(fit_geneexpr,data=df
 #                        ,tables.theme = theme_survminer(font.tickslab = 10)
                         ,risk.table = F
 #                        ,risk.table.height=0.44
-                        ,fontsize = 3,xlab = "Time in Months"
+                        ,fontsize = 50,xlab = "Months"
+                        ,legend = "none"
                         ,legend.lab = group_text
                         ,legend.title = parameter
                         ,palette = palette_colors
+                        ,xlim=c(0,120)
                         )
   fit_pmodel = surv_pvalue(fit_geneexpr,data=df,method="survdiff")
   fit_pval=fit_pmodel$pval
@@ -63,7 +68,11 @@ run_survival <- function(df, group, parameter, threshold){
   #   threshold = paste(threshold, collapse = ",")
   #   fit_annot = sprintf("groups cutoff = %s\nP-value(Log-Rank) = %.5f\ntop25 group count = %s\nbottom group count = %s",threshold,fit_pval,high_count, low_count)
   # }
-  fit_annot = sprintf("P-value(Log-Rank) = %.5f",fit_pval)
-  plot_fit$plot = plot_fit$plot+annotate("text",x=0,y=0.3,label=fit_annot,size=3,hjust=0)
+  fit_annot = sprintf("P = %.5f",fit_pval)
+  plot_fit$plot = plot_fit$plot+
+    annotate("text",x=0,y=0.3,label=fit_annot,size=5,hjust=0)+
+    scale_x_continuous(breaks = seq(0,120,30))+
+    ggtitle(parameter)+
+    theme(plot.title = element_text(size=15, face="bold", hjust=0.5))
   return(plot_fit)
 }

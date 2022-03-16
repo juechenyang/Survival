@@ -46,7 +46,7 @@ get_survival_plot = function(gene_list, cohort_25 = F, percent=0.25){
     survival_data = survival_data[!duplicated(survival_data[c("_PATIENT")]),]
     survival_data = survival_data %>% mutate(OS.time = round(OS.time/30.417, digit=0))
     #keep data with OS less than 10 years
-    survival_data = survival_data[survival_data$OS.time<=120,]
+    #survival_data = survival_data[survival_data$OS.time<=120,]
     threshold = cutoff_function_options(survival_data, gene_signature_name, "mean",
                                         custom = 1.5, "OS.time", "OS")
     group_var = paste0(gene_signature_name, "_group")
@@ -85,32 +85,36 @@ gene_list = list("MT" = MT
                  ,"Complex_V"=Complex_V
                  ,"TCA"=TCA
                  ,"glycolysis"=glycolysis
-                 ,"glycolyticAndTCA"=glycolyticAndTCA
+#                 ,"glycolyticAndTCA"=glycolyticAndTCA
                  ,"MAS"=MAS
                  ,"HIF1A" = HIF1A
-                 ,"CU"=CU
+#                 ,"CU"=CU
                  ,"EMT"=EMT
-                 ,"HIF1A_2A"=HIF1A_2A
+#                 ,"HIF1A_2A"=HIF1A_2A
                  ,"HLA"=HLA
                  ,"MRP"=MRP
                  ,"MRP_positive"=MRP_positive
                  ,"MRP_negative"=MRP_negative
                  )
-plot_list = get_survival_plot(gene_list = gene_list, cohort_25 = T)
+mat_seq = matrix(names(gene_list),nrow = 5)
+mat_seq = t(mat_seq)
+mat_seq_v = as.character(mat_seq)
+gene_list = gene_list[mat_seq_v]
+plot_list = get_survival_plot(gene_list = gene_list, cohort_25 = F)
 
 
 
 
-png("survival_mean_compare.png", units = "in", res = 400, width = 24, height = 13)
+png("survival_mean_compare.png", units = "in", res = 400, width = 20, height = 12)
 arrange_ggsurvplots(plot_list, print = TRUE,
-                    ncol = 5, nrow = 4
+                    ncol = 5, nrow = 3
 #                    ,risk.table.height = 0.3
                     )
 dev.off()
 
 png("survival_25percent_compare.png", units = "in", res = 400, width = 18, height = 11)
 arrange_ggsurvplots(plot_list, print = TRUE,
-                    ncol = 5, nrow = 4
+                    ncol = 5, nrow = 3
 #                   ,risk.table.height = 0.3
                     )
 dev.off()
